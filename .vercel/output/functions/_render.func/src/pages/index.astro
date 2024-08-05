@@ -1,0 +1,10 @@
+---
+import Layout from '../layouts/Layout.astro';
+import ExpensesTracker from '../components/ExpensesTracker';
+---
+
+<Layout title="Expenses Tracker">
+	<main class="container mx-auto p-4">
+		<ExpensesTracker client:load />
+	</main>
+</Layout>
