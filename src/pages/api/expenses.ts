@@ -2,7 +2,8 @@ import type { APIRoute } from 'astro';
 import { db, Expense } from 'astro:db';
 
 export const GET: APIRoute = async () => {
-  return new Response(JSON.stringify({ test: 'This is a test response' }), {
+  const expenses = await db.select().from(Expense).all();
+  return new Response(JSON.stringify(expenses), {
     status: 200,
     headers: {
       'Content-Type': 'application/json',
@@ -29,7 +30,7 @@ export const POST: APIRoute = async ({ request }) => {
       },
     });
   } catch (err) {
-    console.error('Failed to add expense:', err);
+    console.error('Failed to add expense:', err); // Log the error for debugging
     return new Response(JSON.stringify({ error: 'Failed to add expense' }), {
       status: 500,
       headers: {
