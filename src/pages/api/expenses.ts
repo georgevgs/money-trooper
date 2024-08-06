@@ -2,13 +2,23 @@ import type { APIRoute } from 'astro';
 import { db, Expense } from 'astro:db';
 
 export const GET: APIRoute = async () => {
-  const expenses = await db.select().from(Expense).all();
-  return new Response(JSON.stringify(expenses), {
-    status: 200,
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  });
+  try {
+    const expenses = await db.select().from(Expense).all();
+    return new Response(JSON.stringify(expenses), {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+  } catch (error) {
+    console.error('Failed to fetch expenses:', error);
+    return new Response(JSON.stringify({ error: 'Failed to fetch expenses' }), {
+      status: 500,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+  }
 };
 
 export const POST: APIRoute = async ({ request }) => {
@@ -30,7 +40,7 @@ export const POST: APIRoute = async ({ request }) => {
       },
     });
   } catch (err) {
-    console.error('Failed to add expense:', err); // Log the error for debugging
+    console.error('Failed to add expense:', err);
     return new Response(JSON.stringify({ error: 'Failed to add expense' }), {
       status: 500,
       headers: {
