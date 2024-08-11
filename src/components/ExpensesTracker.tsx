@@ -46,13 +46,18 @@ const ExpensesTracker: React.FC = () => {
           Authorization: `Bearer ${token}`,
         },
       });
+
       if (!response.ok) {
         throw new Error('Failed to fetch expenses');
       }
+
       const data = await response.json();
+
       setExpenses(data);
+      setLoading(false);
     } catch (err) {
       setError('Failed to fetch expenses');
+      setLoading(false);
     }
   };
 
