@@ -30,17 +30,30 @@ const ExpensesTracker: React.FC = () => {
     fetchExpenses();
   }, []);
 
+  const getAuthHeaders = () => {
+    const token = localStorage.getItem('authToken');
+    return {
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json',
+    };
+  };
+
   const fetchExpenses = async () => {
     try {
-      const response = await fetch('/api/expenses');
+      const response = await fetch('/api/expenses', {
+        headers: getAuthHeaders(),
+      });
       if (!response.ok) {
+        if (response.status === 401) {
+          throw new Error('Unauthorized: Please log in again');
+        }
         throw new Error('Failed to fetch expenses');
       }
       const data = await response.json();
       setExpenses(data);
       setLoading(false);
     } catch (err) {
-      setError('Failed to fetch expenses');
+      setError(err instanceof Error ? err.message : 'Failed to fetch expenses');
       setLoading(false);
     }
   };
@@ -53,7 +66,7 @@ const ExpensesTracker: React.FC = () => {
     try {
       const response = await fetch('/api/expenses', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: getAuthHeaders(),
         body: JSON.stringify({
           description,
           amount: parseFloat(amount),
@@ -62,6 +75,9 @@ const ExpensesTracker: React.FC = () => {
         }),
       });
       if (!response.ok) {
+        if (response.status === 401) {
+          throw new Error('Unauthorized: Please log in again');
+        }
         throw new Error('Failed to add expense');
       }
       fetchExpenses();
@@ -69,7 +85,7 @@ const ExpensesTracker: React.FC = () => {
       setAmount('');
       setCategory('');
     } catch (err) {
-      setError('Failed to add expense');
+      setError(err instanceof Error ? err.message : 'Failed to add expense');
     }
   };
 
@@ -77,13 +93,17 @@ const ExpensesTracker: React.FC = () => {
     try {
       const response = await fetch(`/api/expenses/${id}`, {
         method: 'DELETE',
+        headers: getAuthHeaders(),
       });
       if (!response.ok) {
+        if (response.status === 401) {
+          throw new Error('Unauthorized: Please log in again');
+        }
         throw new Error('Failed to remove expense');
       }
       fetchExpenses();
     } catch (err) {
-      setError('Failed to remove expense');
+      setError(err instanceof Error ? err.message : 'Failed to remove expense');
     }
   };
 

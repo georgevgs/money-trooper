@@ -6,6 +6,9 @@ import netlify from "@astrojs/netlify";
 
 export default defineConfig({
   output: 'server',
+  server: {
+    cors: true,
+  },
   integrations: [react(), tailwind(), db()],
   adapter: netlify()
 });
