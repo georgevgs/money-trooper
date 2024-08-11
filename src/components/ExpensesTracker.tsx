@@ -40,21 +40,19 @@ const ExpensesTracker: React.FC = () => {
 
   const fetchExpenses = async () => {
     try {
+      const token = localStorage.getItem('authToken');
       const response = await fetch('/api/expenses', {
-        headers: getAuthHeaders(),
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       });
       if (!response.ok) {
-        if (response.status === 401) {
-          throw new Error('Unauthorized: Please log in again');
-        }
         throw new Error('Failed to fetch expenses');
       }
       const data = await response.json();
       setExpenses(data);
-      setLoading(false);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to fetch expenses');
-      setLoading(false);
+      setError('Failed to fetch expenses');
     }
   };
 

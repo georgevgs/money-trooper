@@ -4,14 +4,18 @@ import { verifyToken } from '@/authUtils';
 
 const authenticateUser = async (request: Request) => {
   const authHeader = request.headers.get('Authorization');
+
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
     throw new Error('No token provided');
   }
+
   const token = authHeader.split(' ')[1];
   const payload = verifyToken(token);
+
   if (!payload) {
     throw new Error('Invalid token');
   }
+
   return payload.userId;
 };
 
@@ -23,6 +27,7 @@ export const GET: APIRoute = async ({ request }) => {
       .from(Expense)
       .where(eq(Expense.userId, userId))
       .all();
+
     return new Response(JSON.stringify(expenses), {
       status: 200,
       headers: {
@@ -30,7 +35,6 @@ export const GET: APIRoute = async ({ request }) => {
       },
     });
   } catch (error) {
-    console.error('Authentication error:', error);
     return new Response(JSON.stringify({ error: 'Unauthorized' }), {
       status: 401,
       headers: {
@@ -61,7 +65,6 @@ export const POST: APIRoute = async ({ request }) => {
       },
     });
   } catch (error) {
-    console.error('Failed to add expense:', error);
     if (
       error instanceof Error &&
       (error.message === 'No token provided' ||
@@ -74,6 +77,7 @@ export const POST: APIRoute = async ({ request }) => {
         },
       });
     }
+
     return new Response(JSON.stringify({ error: 'Failed to add expense' }), {
       status: 500,
       headers: {
