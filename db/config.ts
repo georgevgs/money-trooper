@@ -4,7 +4,6 @@ const User = defineTable({
   columns: {
     id: column.text({ primaryKey: true }),
     username: column.text({ unique: true }),
-    name: column.text({ unique: true, deprecated: true }),
     email: column.text({ unique: true, optional: true }),
     image: column.text({ optional: true }),
     passwordHash: column.text(),
