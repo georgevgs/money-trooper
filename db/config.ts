@@ -2,10 +2,10 @@ import { defineDb, defineTable, column } from 'astro:db';
 
 const User = defineTable({
   columns: {
-    id: column.text({ primaryKey: true }), // Changed to text type
-    name: column.text({ unique: true }),
-    email: column.text({ unique: true }),
+    id: column.text({ primaryKey: true }),
+    username: column.text({ unique: true }),
     image: column.text({ optional: true }),
+    passwordHash: column.text(),
   },
 });
 
@@ -16,7 +16,7 @@ const Expense = defineTable({
     amount: column.number(),
     date: column.date(),
     category: column.text(),
-    userId: column.text({ references: () => User.columns.id }), // Changed to text type
+    userId: column.text({ references: () => User.columns.id }),
   },
 });
 

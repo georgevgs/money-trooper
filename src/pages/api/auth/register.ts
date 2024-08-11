@@ -7,13 +7,13 @@ export const POST: APIRoute = async ({ request }) => {
     const { username, password } = await request.json();
 
     // Check if user already exists
-    const existingUsers = await db
+    const existingUser = await db
       .select()
       .from(User)
       .where(eq(User.username, username))
-      .all();
+      .get();
 
-    if (existingUsers.length > 0) {
+    if (existingUser) {
       return new Response(
         JSON.stringify({ error: 'Username already exists' }),
         {
@@ -26,21 +26,35 @@ export const POST: APIRoute = async ({ request }) => {
     // Hash the password
     const passwordHash = await hashPassword(password);
 
-    // Insert new user
-    await db.insert(User).values({
-      username,
-      passwordHash,
-    });
+    // Generate a unique ID
+    const id = crypto.randomUUID();
 
-    return new Response(JSON.stringify({ success: true }), {
+    // Insert new user
+    const newUser = await db
+      .insert(User)
+      .values({
+        id,
+        username,
+        passwordHash,
+      })
+      .returning()
+      .get();
+
+    return new Response(JSON.stringify({ success: true, userId: newUser.id }), {
       status: 201,
       headers: { 'Content-Type': 'application/json' },
     });
   } catch (error) {
     console.error('Registration failed:', error);
-    return new Response(JSON.stringify({ error: 'Registration failed' }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json' },
-    });
+    return new Response(
+      JSON.stringify({
+        error: 'Registration failed',
+        details: error instanceof Error ? error.message : String(error),
+      }),
+      {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' },
+      },
+    );
   }
 };
